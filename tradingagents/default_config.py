@@ -105,6 +105,9 @@ DEFAULT_CONFIG = _apply_env_overrides({
         "technical_indicators": "yfinance",  # Options: alpha_vantage, yfinance
         "fundamental_data": "yfinance",      # Options: alpha_vantage, yfinance
         "news_data": "yfinance",             # Options: alpha_vantage, yfinance
+        # Crypto on-chain data. Comma-list: each tool is served by whichever
+        # listed source registers it (coingecko, defillama, glassnode).
+        "onchain_data": "coingecko,defillama,glassnode",
     },
     # Tool-level configuration (takes precedence over category-level)
     "tool_vendors": {

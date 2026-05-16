@@ -58,17 +58,17 @@ Ships: BTC on-chain metrics from open-data providers.
 
 ### 2.1 Provider tools
 
-- [ ] 2.1.1 Create on-chain data adapter(s) under `dataflows/` for tokenomics, TVL, active addresses, exchange flows, dev activity, using open providers (CoinGecko, DefiLlama), each registered in the source registry from Phase 1.2
-- [ ] 2.1.2 Date-bound on-chain tools to the as-of date; flag any provider that cannot honor it
+- [x] 2.1.1 Create on-chain data adapter(s) under `dataflows/` for tokenomics, TVL, active addresses, exchange flows, dev activity, using open providers (CoinGecko, DefiLlama), each registered in the source registry from Phase 1.2
+- [x] 2.1.2 Date-bound on-chain tools to the as-of date; flag any provider that cannot honor it
 
 ### 2.2 Graceful degradation
 
-- [ ] 2.2.1 Make each on-chain tool degrade to partial data when its API key is absent, rather than raising
+- [x] 2.2.1 Make each on-chain tool degrade to partial data when its API key is absent, rather than raising
 
 ### 2.3 Verify Phase 2
 
-- [ ] 2.3.1 Smoke test: fetch BTC on-chain metrics for a historical date
-- [ ] 2.3.2 Smoke test: a tool with a missing API key returns partial data without crashing the run
+- [x] 2.3.1 Smoke test: fetch BTC on-chain metrics for a historical date
+- [x] 2.3.2 Smoke test: a tool with a missing API key returns partial data without crashing the run
 
 ## 3. Phase 3 — On-Chain Analyst
 

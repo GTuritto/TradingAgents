@@ -31,7 +31,7 @@ from .config import get_config
 # vendor module here triggers its register_source() call; the registry is
 # then folded into VENDOR_METHODS below, so adding a new source needs no
 # edit to this import block beyond one line.
-from . import ccxt_vendor  # noqa: F401 — imported for its registration side effect
+from . import ccxt_vendor, coingecko, defillama, glassnode  # noqa: F401 — imported for their registration side effect
 from .source_registry import registered_sources
 
 # Tools organized by category
@@ -63,6 +63,15 @@ TOOLS_CATEGORIES = {
             "get_news",
             "get_global_news",
             "get_insider_transactions",
+        ]
+    },
+    "onchain_data": {
+        "description": "Crypto on-chain and tokenomics data",
+        "tools": [
+            "get_tokenomics",
+            "get_tvl",
+            "get_dev_activity",
+            "get_chain_activity",
         ]
     }
 }
