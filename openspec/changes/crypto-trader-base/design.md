@@ -28,8 +28,8 @@ The framework already has a **vendor abstraction** (`data_vendors` category-leve
 
 ## Decisions
 
-**D1 — CCXT as the market-data vendor, not yfinance crypto pairs.**
-yfinance exposes `BTC-USD` but coverage is thin, laggy, and single-source. CCXT unifies 100+ exchanges behind one API, gives real OHLCV at multiple timeframes, and is the de-facto standard. It is registered as a new vendor value (`"ccxt"`) under the existing `data_vendors` categories — equity vendors are untouched. *Alternative considered:* a direct Binance client — rejected, ties the framework to one exchange.
+**D1 — CCXT as the market-data vendor, with a config-selectable exchange defaulting to Gemini.**
+yfinance exposes `BTC-USD` but coverage is thin, laggy, and single-source. CCXT unifies 100+ exchanges behind one API, gives real OHLCV at multiple timeframes, and is the de-facto standard. It is registered as a new vendor value (`"ccxt"`) under the existing `data_vendors` categories — equity vendors are untouched. The specific exchange is a config key (`ccxt_exchange`), defaulting to **`gemini`** (the user's trading venue); any other CCXT-supported exchange is a config change, no code change. *Alternative considered:* a direct exchange-specific client — rejected, ties the framework to one exchange and forfeits the config-selectable seam.
 
 **D2 — On-Chain Analyst replaces, not extends, the Fundamentals Analyst for crypto.**
 The committee role ("the deep-value/fundamental member") is preserved; only its tools and prompt change. Selection is config-driven via `selected_analysts` and an asset-class flag, so `graph/setup.py` builds either `fundamentals` or `onchain` into the same slot. *Alternative considered:* adding On-Chain as a 5th analyst — rejected, lengthens the pipeline and the Fundamentals node would still run with no valid data for crypto.
@@ -48,6 +48,9 @@ The harness loops `propagate(asset, date)` over a historical date range, reusing
 - **On-chain data sources** are open / free providers — CoinGecko and DefiLlama to start, with room to add other open providers later. No paid tiers (Glassnode and similar) in this change; their absence must not block a run (see graceful-degradation risk below).
 - **Asset universe** for the first backtest is **BTC only**. ETH, XRP, and a broader basket are explicit follow-up expansions, taken on once the single-asset loop is proven end to end.
 - **On-Chain Analyst** ships as a **single generalist prompt**. Per-asset-type specialization (L1 vs. DeFi token vs. memecoin, which have very different on-chain signals) is deferred until the asset universe actually broadens — it has no value while only BTC is in scope.
+
+**D7 — Data sources are a config-driven registry, not hard-wired imports.**
+The user wants to add new data sources by configuration. Each data source (the CCXT exchange, each on-chain provider, each news provider) is an *adapter* registered under a name in a source registry. The existing `data_vendors` (category-level) and `tool_vendors` (per-tool override) config keys then select which registered adapter serves each tool category — this part already exists and is reused as-is. Adding a brand-new source is: write a small adapter conforming to the source interface, register it under a name, and select it via config. This keeps `dataflows/interface.py` free of a growing thicket of conditional imports and makes "add a source" a config operation for any already-registered adapter. *Alternative considered:* a fully generic, config-described HTTP adapter that needs zero adapter code for plain REST sources — attractive but unbounded in scope; flagged as an open question, not committed here. *Alternative considered:* keep hard-wiring vendors in `interface.py` — rejected, it does not scale as providers multiply and contradicts the user's config-extensibility requirement.
 
 ## Risks / Trade-offs
 
@@ -68,3 +71,4 @@ Resolved during exploration (see Decision D6): on-chain providers (CoinGecko + D
 Remaining:
 
 - Exact backtest **date range and cadence** for the first BTC sweep — the swing horizon points to a weekly cadence over a multi-month historical window, but the precise span is an apply-time detail to fix once data coverage from CoinGecko/DefiLlama for that period is confirmed.
+- Whether the config-driven registry (D7) should eventually support a **generic config-described HTTP adapter** so that plain REST data sources can be added with zero adapter code. Out of scope for this change; revisit once a few real adapters exist and their shared shape is clear.

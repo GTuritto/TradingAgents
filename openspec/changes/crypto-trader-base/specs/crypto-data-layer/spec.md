@@ -19,6 +19,20 @@ The system SHALL provide a crypto market-data vendor that supplies OHLCV price d
 - **WHEN** the indicator tool is invoked for a crypto asset after OHLCV data has been retrieved
 - **THEN** the system computes the requested technical indicators over the crypto OHLCV series using the same indicator engine used for equities
 
+### Requirement: Configurable exchange
+
+The crypto market-data vendor SHALL source data from a CCXT-supported exchange selected by configuration, defaulting to Gemini. Switching to another supported exchange SHALL require only a configuration change.
+
+#### Scenario: Default exchange
+
+- **WHEN** a crypto market-data tool is invoked with no exchange explicitly configured
+- **THEN** the vendor sources data from the Gemini exchange
+
+#### Scenario: Exchange overridden by configuration
+
+- **WHEN** the configured exchange is set to another CCXT-supported exchange
+- **THEN** the vendor sources data from that exchange with no code change required
+
 ### Requirement: On-chain data providers
 
 The system SHALL provide on-chain data tools that supply tokenomics and chain-activity metrics (supply schedule, total value locked, active addresses, exchange flows, development activity) for cryptocurrency assets.
@@ -41,3 +55,22 @@ Every crypto data tool SHALL accept an as-of date and return only data available
 
 - **WHEN** a crypto data tool is invoked with an as-of date during a backtest run
 - **THEN** the returned data contains no observations dated after the as-of date
+
+### Requirement: Config-driven data-source registry
+
+Data sources SHALL be exposed through a registry of named adapters, so that an already-registered source can be selected for a tool category purely by configuration, without editing data-routing code.
+
+#### Scenario: Selecting a registered source by configuration
+
+- **WHEN** the vendor configuration for a tool category names a registered data-source adapter
+- **THEN** the system routes that category's tools to the named adapter without any code change
+
+#### Scenario: Adding a new data source
+
+- **WHEN** a new data-source adapter is implemented and registered under a name
+- **THEN** that source becomes selectable through the same vendor configuration as existing sources
+
+#### Scenario: Unknown source name
+
+- **WHEN** the vendor configuration names a data source that is not registered
+- **THEN** the system raises a clear configuration error identifying the unknown source name
