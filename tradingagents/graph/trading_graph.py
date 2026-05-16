@@ -36,7 +36,11 @@ from tradingagents.agents.utils.agent_utils import (
     get_income_statement,
     get_news,
     get_insider_transactions,
-    get_global_news
+    get_global_news,
+    get_tokenomics,
+    get_tvl,
+    get_dev_activity,
+    get_chain_activity,
 )
 
 from .checkpointer import checkpoint_step, clear_checkpoint, get_checkpointer, thread_id
@@ -114,6 +118,7 @@ class TradingAgentsGraph:
             self.deep_thinking_llm,
             self.tool_nodes,
             self.conditional_logic,
+            asset_class=self.config.get("asset_class", "equity"),
         )
 
         self.propagator = Propagator(
@@ -155,7 +160,28 @@ class TradingAgentsGraph:
         return kwargs
 
     def _create_tool_nodes(self) -> Dict[str, ToolNode]:
-        """Create tool nodes for different data sources using abstract methods."""
+        """Create tool nodes for different data sources using abstract methods.
+
+        The "fundamentals" slot holds on-chain tools for crypto runs and
+        corporate-financials tools for equity runs, matching the analyst
+        that GraphSetup places in that slot.
+        """
+        if self.config.get("asset_class", "equity") == "crypto":
+            deep_value_tools = [
+                # On-chain and tokenomics tools
+                get_tokenomics,
+                get_tvl,
+                get_dev_activity,
+                get_chain_activity,
+            ]
+        else:
+            deep_value_tools = [
+                # Fundamental analysis tools
+                get_fundamentals,
+                get_balance_sheet,
+                get_cashflow,
+                get_income_statement,
+            ]
         return {
             "market": ToolNode(
                 [
@@ -179,15 +205,7 @@ class TradingAgentsGraph:
                     get_insider_transactions,
                 ]
             ),
-            "fundamentals": ToolNode(
-                [
-                    # Fundamental analysis tools
-                    get_fundamentals,
-                    get_balance_sheet,
-                    get_cashflow,
-                    get_income_statement,
-                ]
-            ),
+            "fundamentals": ToolNode(deep_value_tools),
         }
 
     def _resolve_benchmark(self, ticker: str) -> str:

@@ -19,12 +19,19 @@ class GraphSetup:
         deep_thinking_llm: Any,
         tool_nodes: Dict[str, ToolNode],
         conditional_logic: ConditionalLogic,
+        asset_class: str = "equity",
     ):
-        """Initialize with required components."""
+        """Initialize with required components.
+
+        ``asset_class`` selects which analyst fills the deep-value slot:
+        the Fundamentals Analyst for equities, the On-Chain Analyst for
+        crypto.
+        """
         self.quick_thinking_llm = quick_thinking_llm
         self.deep_thinking_llm = deep_thinking_llm
         self.tool_nodes = tool_nodes
         self.conditional_logic = conditional_logic
+        self.asset_class = asset_class
 
     def setup_graph(
         self, selected_analysts=["market", "social", "news", "fundamentals"]
@@ -72,9 +79,16 @@ class GraphSetup:
             tool_nodes["news"] = self.tool_nodes["news"]
 
         if "fundamentals" in selected_analysts:
-            analyst_nodes["fundamentals"] = create_fundamentals_analyst(
-                self.quick_thinking_llm
-            )
+            # The deep-value slot: On-Chain Analyst for crypto, Fundamentals
+            # Analyst for equities. Both write the fundamentals_report field.
+            if self.asset_class == "crypto":
+                analyst_nodes["fundamentals"] = create_onchain_analyst(
+                    self.quick_thinking_llm
+                )
+            else:
+                analyst_nodes["fundamentals"] = create_fundamentals_analyst(
+                    self.quick_thinking_llm
+                )
             delete_nodes["fundamentals"] = create_msg_delete()
             tool_nodes["fundamentals"] = self.tool_nodes["fundamentals"]
 

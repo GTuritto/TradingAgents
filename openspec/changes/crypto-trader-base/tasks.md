@@ -76,17 +76,17 @@ Ships: a full BTC committee run with the On-Chain Analyst in the deep-value slot
 
 ### 3.1 Analyst node
 
-- [ ] 3.1.1 Create `agents/analysts/onchain_analyst.py` mirroring the Fundamentals Analyst node shape, bound only to on-chain tools
-- [ ] 3.1.2 Write the On-Chain Analyst system prompt — single generalist prompt, crypto vocabulary, no P/E or earnings framing
+- [x] 3.1.1 Create `agents/analysts/onchain_analyst.py` mirroring the Fundamentals Analyst node shape, bound only to on-chain tools
+- [x] 3.1.2 Write the On-Chain Analyst system prompt — single generalist prompt, crypto vocabulary, no P/E or earnings framing
 
 ### 3.2 Graph wiring
 
-- [ ] 3.2.1 Update `graph/setup.py` to select On-Chain vs Fundamentals Analyst into the deep-value slot based on `asset_class`
-- [ ] 3.2.2 Confirm the On-Chain Analyst writes its report into the shared-state field consumed by downstream researcher and manager nodes
+- [x] 3.2.1 Update `graph/setup.py` to select On-Chain vs Fundamentals Analyst into the deep-value slot based on `asset_class`
+- [x] 3.2.2 Confirm the On-Chain Analyst writes its report into the shared-state field consumed by downstream researcher and manager nodes
 
 ### 3.3 Verify Phase 3
 
-- [ ] 3.3.1 Smoke test: a single end-to-end BTC committee run produces a BUY/HOLD/SELL decision
+- [x] 3.3.1 Smoke test: a single end-to-end BTC committee run produces a BUY/HOLD/SELL decision
 
 ## 4. Phase 4 — Crypto reflection layer
 
