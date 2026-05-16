@@ -17,6 +17,8 @@ _ENV_OVERRIDES = {
     "TRADINGAGENTS_MAX_RISK_ROUNDS":      "max_risk_discuss_rounds",
     "TRADINGAGENTS_CHECKPOINT_ENABLED":   "checkpoint_enabled",
     "TRADINGAGENTS_BENCHMARK_TICKER":     "benchmark_ticker",
+    "TRADINGAGENTS_ASSET_CLASS":          "asset_class",
+    "TRADINGAGENTS_CCXT_EXCHANGE":        "ccxt_exchange",
 }
 
 
@@ -89,6 +91,13 @@ DEFAULT_CONFIG = _apply_env_overrides({
         "ECB Bank of England BOJ central bank policy",
         "oil commodities supply chain energy",
     ],
+    # Asset class — drives data-vendor selection, analyst selection, and
+    # benchmark resolution. "equity" preserves the original behavior;
+    # "crypto" routes to crypto data sources and the On-Chain Analyst.
+    "asset_class": "equity",
+    # CCXT exchange id used by the crypto market-data vendor. Any
+    # ccxt-supported exchange works; switching exchanges is config-only.
+    "ccxt_exchange": "gemini",
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {
@@ -107,6 +116,8 @@ DEFAULT_CONFIG = _apply_env_overrides({
     # based on the ticker's exchange suffix. SPY remains the US default
     # so the reflection label keeps reading "Alpha vs SPY" for US tickers
     # while non-US tickers get their regional index automatically.
+    # For ``asset_class="crypto"`` runs, alpha is measured against BTC via
+    # the ``"crypto"`` sentinel entry in ``benchmark_map``.
     "benchmark_ticker": None,
     "benchmark_map": {
         ".NS":  "^NSEI",    # NSE India (Nifty 50)
@@ -117,5 +128,6 @@ DEFAULT_CONFIG = _apply_env_overrides({
         ".TO":  "^GSPTSE",  # Toronto (TSX Composite)
         ".AX":  "^AXJO",    # Australia (ASX 200)
         "":     "SPY",      # default for US-listed tickers (no suffix)
+        "crypto": "BTC",    # sentinel for asset_class="crypto" — resolved by _resolve_benchmark, not a ticker suffix
     },
 })

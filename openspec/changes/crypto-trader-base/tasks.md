@@ -14,17 +14,17 @@ Ships: an `asset_class` config switch; equity behavior unchanged.
 
 ### 0.1 Config keys
 
-- [ ] 0.1.1 Add `asset_class` config key (`"equity"` | `"crypto"`, default `"equity"`) to `default_config.py` with a `TRADINGAGENTS_ASSET_CLASS` env override
-- [ ] 0.1.2 Add `"BTC"` crypto default to `benchmark_map` and document crypto alpha resolution
-- [ ] 0.1.3 Add `ccxt_exchange` config key (default `"gemini"`) with a `TRADINGAGENTS_CCXT_EXCHANGE` env override
+- [x] 0.1.1 Add `asset_class` config key (`"equity"` | `"crypto"`, default `"equity"`) to `default_config.py` with a `TRADINGAGENTS_ASSET_CLASS` env override
+- [x] 0.1.2 Add `"BTC"` crypto default to `benchmark_map` and document crypto alpha resolution
+- [x] 0.1.3 Add `ccxt_exchange` config key (default `"gemini"`) with a `TRADINGAGENTS_CCXT_EXCHANGE` env override
 
 ### 0.2 Dependencies
 
-- [ ] 0.2.1 Add `ccxt` to `pyproject.toml` dependencies, to be lazy-imported (mirroring the pattern in `llm_clients/factory.py`)
+- [x] 0.2.1 Add `ccxt` to `pyproject.toml` dependencies, to be lazy-imported (mirroring the pattern in `llm_clients/factory.py`)
 
 ### 0.3 Verify Phase 0
 
-- [ ] 0.3.1 Smoke test: an equity run is unaffected, and `asset_class: crypto` is recognized by config without error
+- [x] 0.3.1 Smoke test: an equity run is unaffected, and `asset_class: crypto` is recognized by config without error
 
 ## 1. Phase 1 — Crypto market-data vendor & source registry
 
