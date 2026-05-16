@@ -154,6 +154,12 @@ Ships: test coverage and a confirmed no-regression baseline.
 - [ ] 7.2.1 Run an equity smoke test to confirm no regression in equity behavior
 - [ ] 7.2.2 Audit all crypto data/news tools for look-ahead bias (no observation dated after the as-of date)
 
-### 7.3 Verify Phase 7
+### 7.3 Documentation
 
-- [ ] 7.3.1 Full test suite passes; equity and crypto paths both green
+- [ ] 7.3.1 Update `README.md` to document crypto support (`asset_class`, OpenRouter provider, CCXT + on-chain data sources, the On-Chain Analyst)
+- [ ] 7.3.2 Add a `CHANGELOG.md` entry for the crypto-trader-base change
+- [ ] 7.3.3 Refresh the `docs/architecture/` C4 diagrams to the final shipped state
+
+### 7.4 Verify Phase 7
+
+- [ ] 7.4.1 Full test suite passes; equity and crypto paths both green
