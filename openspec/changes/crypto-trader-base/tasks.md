@@ -94,15 +94,15 @@ Ships: correct outcome resolution for crypto — BTC benchmark, 24/7 calendar.
 
 ### 4.1 Benchmark
 
-- [ ] 4.1.1 Update `_resolve_benchmark` to return `BTC` for `asset_class: crypto` when no explicit `benchmark_ticker` is set
+- [x] 4.1.1 Update `_resolve_benchmark` to return `BTC` for `asset_class: crypto` when no explicit `benchmark_ticker` is set
 
 ### 4.2 Calendar
 
-- [ ] 4.2.1 Update `_fetch_returns` to drop the weekday/holiday buffer for crypto assets (every calendar day is a trading day)
+- [x] 4.2.1 Update `_fetch_returns` to drop the weekday/holiday buffer for crypto assets (every calendar day is a trading day)
 
 ### 4.3 Verify Phase 4
 
-- [ ] 4.3.1 Smoke test: two sequential BTC runs — the second resolves the first's pending entry with realized return and BTC alpha
+- [x] 4.3.1 Smoke test: two sequential BTC runs — the second resolves the first's pending entry with realized return and BTC alpha
 
 ## 5. Phase 5 — Crypto prompt tuning
 

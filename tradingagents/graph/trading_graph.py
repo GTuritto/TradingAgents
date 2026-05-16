@@ -211,23 +211,35 @@ class TradingAgentsGraph:
     def _resolve_benchmark(self, ticker: str) -> str:
         """Pick the benchmark ticker for alpha calculation against ``ticker``.
 
-        ``config["benchmark_ticker"]`` overrides everything when set; otherwise
-        the suffix map matches the ticker's exchange suffix (e.g. ``.T`` for
-        Tokyo). US-listed tickers without a dotted suffix fall through to the
-        empty-suffix entry (SPY by default). Unrecognised suffixes (including
-        US tickers with dots like ``BRK.B``) also fall back to the empty-suffix
-        entry, which is the right default because the alpha calculation works
-        in USD.
+        ``config["benchmark_ticker"]`` overrides everything when set. For
+        crypto runs (``asset_class == "crypto"``) alpha is measured against
+        BTC — the ``"crypto"`` entry in ``benchmark_map`` — so a BTC trade's
+        alpha is naturally zero and an altcoin's alpha is its excess over
+        BTC. Otherwise the suffix map matches the ticker's exchange suffix
+        (e.g. ``.T`` for Tokyo); US-listed tickers without a dotted suffix
+        fall through to the empty-suffix entry (SPY by default), as do
+        unrecognised suffixes, which is correct because the alpha
+        calculation works in USD.
         """
         explicit = self.config.get("benchmark_ticker")
         if explicit:
             return explicit
         benchmark_map = self.config.get("benchmark_map", {})
+        if self.config.get("asset_class") == "crypto":
+            return benchmark_map.get("crypto", "BTC")
         ticker_upper = ticker.upper()
         for suffix, benchmark in benchmark_map.items():
             if suffix and ticker_upper.endswith(suffix.upper()):
                 return benchmark
         return benchmark_map.get("", "SPY")
+
+    def _crypto_close_series(self, symbol: str, start_date: str, end_date: str):
+        """Daily close prices for a crypto symbol from the configured CCXT
+        exchange, as a position-indexed Series — the same source the
+        committee analysed. Raises on failure (the caller catches)."""
+        from tradingagents.dataflows.ccxt_vendor import fetch_ohlcv_df
+
+        return fetch_ohlcv_df(symbol, start_date, end_date)["Close"].reset_index(drop=True)
 
     def _fetch_returns(
         self, ticker: str, trade_date: str, holding_days: int = 5,
@@ -235,31 +247,35 @@ class TradingAgentsGraph:
     ) -> Tuple[Optional[float], Optional[float], Optional[int]]:
         """Fetch raw and alpha return for ticker over holding_days from trade_date.
 
-        ``benchmark`` is the index used as the alpha baseline (resolved by the
-        caller via ``_resolve_benchmark``). Returns ``(raw_return, alpha_return,
+        ``benchmark`` is the baseline for alpha (resolved by the caller via
+        ``_resolve_benchmark``). Returns ``(raw_return, alpha_return,
         actual_holding_days)`` or ``(None, None, None)`` if price data is
         unavailable (too recent, delisted, or network error).
+
+        Crypto assets price from the configured CCXT exchange and trade every
+        calendar day, so no weekend/holiday padding is applied — only +1 for
+        the exclusive end bound. Equities price from yfinance and pad the
+        window by 7 days to span non-trading days.
         """
         try:
+            is_crypto = self.config.get("asset_class") == "crypto"
             start = datetime.strptime(trade_date, "%Y-%m-%d")
-            end = start + timedelta(days=holding_days + 7)  # buffer for weekends/holidays
+            end = start + timedelta(days=holding_days + (1 if is_crypto else 7))
             end_str = end.strftime("%Y-%m-%d")
 
-            stock = yf.Ticker(ticker).history(start=trade_date, end=end_str)
-            bench = yf.Ticker(benchmark).history(start=trade_date, end=end_str)
+            if is_crypto:
+                stock = self._crypto_close_series(ticker, trade_date, end_str)
+                bench = self._crypto_close_series(benchmark, trade_date, end_str)
+            else:
+                stock = yf.Ticker(ticker).history(start=trade_date, end=end_str)["Close"]
+                bench = yf.Ticker(benchmark).history(start=trade_date, end=end_str)["Close"]
 
             if len(stock) < 2 or len(bench) < 2:
                 return None, None, None
 
             actual_days = min(holding_days, len(stock) - 1, len(bench) - 1)
-            raw = float(
-                (stock["Close"].iloc[actual_days] - stock["Close"].iloc[0])
-                / stock["Close"].iloc[0]
-            )
-            bench_ret = float(
-                (bench["Close"].iloc[actual_days] - bench["Close"].iloc[0])
-                / bench["Close"].iloc[0]
-            )
+            raw = float((stock.iloc[actual_days] - stock.iloc[0]) / stock.iloc[0])
+            bench_ret = float((bench.iloc[actual_days] - bench.iloc[0]) / bench.iloc[0])
             alpha = raw - bench_ret
             return raw, alpha, actual_days
         except Exception as e:

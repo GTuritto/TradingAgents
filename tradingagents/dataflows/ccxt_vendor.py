@@ -48,12 +48,14 @@ def _normalize_symbol(symbol: str) -> str:
     return s if "/" in s else f"{s}/USD"
 
 
-def _fetch_ohlcv_df(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
+def fetch_ohlcv_df(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
     """Fetch daily OHLCV as a DataFrame, bounded to ``end_date`` (no look-ahead).
 
     Returns columns Date/Open/High/Low/Close/Volume. ``end_date`` is
     inclusive to end-of-day; rows outside [start_date, end_date] are
-    dropped so backtest runs never see future candles.
+    dropped so backtest runs never see future candles. Public so the
+    reflection layer can price crypto outcomes from the same exchange the
+    committee analysed.
     """
     exchange = _get_exchange()
     market = _normalize_symbol(symbol)
@@ -103,7 +105,7 @@ def get_ccxt_stock_data(
     datetime.strptime(end_date, "%Y-%m-%d")
 
     try:
-        df = _fetch_ohlcv_df(symbol, start_date, end_date)
+        df = fetch_ohlcv_df(symbol, start_date, end_date)
     except Exception as e:
         return f"Error retrieving crypto OHLCV for '{symbol}': {e}"
 
@@ -152,7 +154,7 @@ def get_ccxt_indicators(
     ).strftime("%Y-%m-%d")
 
     try:
-        df = _fetch_ohlcv_df(symbol, fetch_start, curr_date)
+        df = fetch_ohlcv_df(symbol, fetch_start, curr_date)
     except Exception as e:
         return f"Error retrieving crypto indicator data for '{symbol}': {e}"
 
