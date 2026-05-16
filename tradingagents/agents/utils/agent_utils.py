@@ -18,6 +18,12 @@ from tradingagents.agents.utils.news_data_tools import (
     get_insider_transactions,
     get_global_news
 )
+from tradingagents.agents.utils.onchain_tools import (
+    get_chain_activity,
+    get_dev_activity,
+    get_tokenomics,
+    get_tvl,
+)
 
 
 def get_language_instruction() -> str:

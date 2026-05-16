@@ -217,3 +217,18 @@ __marimo__/
 
 # Cache
 **/data_cache/
+
+# AI / agent tooling — generated scaffolding, not project source.
+# Targeted on purpose: project-specific skills, settings, and real
+# .github CI files stay trackable.
+.agent/
+.codex/
+.gemini/
+.windsurf/
+.history/
+.specstory/
+.github/prompts/
+.github/skills/openspec-*/
+.claude/commands/opsx/
+.claude/skills/openspec-*/
+TradingAgents.code-workspace
