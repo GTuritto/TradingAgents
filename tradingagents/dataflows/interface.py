@@ -27,6 +27,13 @@ from .alpha_vantage_common import AlphaVantageRateLimitError
 # Configuration and routing logic
 from .config import get_config
 
+# Config-driven data sources register themselves on import. Importing the
+# vendor module here triggers its register_source() call; the registry is
+# then folded into VENDOR_METHODS below, so adding a new source needs no
+# edit to this import block beyond one line.
+from . import ccxt_vendor  # noqa: F401 — imported for its registration side effect
+from .source_registry import registered_sources
+
 # Tools organized by category
 TOOLS_CATEGORIES = {
     "core_stock_apis": {
@@ -109,6 +116,16 @@ VENDOR_METHODS = {
     },
 }
 
+# Fold config-driven sources (registered via source_registry) into the
+# routing table and the known-vendor list. Equity vendors stay declared
+# directly above; crypto and future sources arrive through the registry.
+for _source, _methods in registered_sources().items():
+    for _method, _impl in _methods.items():
+        VENDOR_METHODS.setdefault(_method, {})[_source] = _impl
+    if _source not in VENDOR_LIST:
+        VENDOR_LIST.append(_source)
+
+
 def get_category_for_method(method: str) -> str:
     """Get the category that contains the specified method."""
     for category, info in TOOLS_CATEGORIES.items():
@@ -136,6 +153,16 @@ def route_to_vendor(method: str, *args, **kwargs):
     category = get_category_for_method(method)
     vendor_config = get_vendor(category, method)
     primary_vendors = [v.strip() for v in vendor_config.split(',')]
+
+    # Fail loudly on a misconfigured source name rather than silently
+    # falling through to another vendor. "default" is the legacy
+    # category-fallback sentinel and is allowed through.
+    for vendor in primary_vendors:
+        if vendor and vendor != "default" and vendor not in VENDOR_LIST:
+            raise ValueError(
+                f"Unknown data source '{vendor}' configured for '{method}'. "
+                f"Known sources: {VENDOR_LIST}."
+            )
 
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")

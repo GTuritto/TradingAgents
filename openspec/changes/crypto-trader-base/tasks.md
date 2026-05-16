@@ -33,24 +33,24 @@ Gemini), reachable through a config-driven data-source registry.
 
 ### 1.1 CCXT vendor module
 
-- [ ] 1.1.1 Create a CCXT-backed vendor module under `dataflows/` exposing OHLCV retrieval, selecting the exchange from the `ccxt_exchange` config key (default `gemini`), lazily importing `ccxt`
-- [ ] 1.1.2 Wire crypto indicator computation to reuse the existing indicator engine over crypto OHLCV
+- [x] 1.1.1 Create a CCXT-backed vendor module under `dataflows/` exposing OHLCV retrieval, selecting the exchange from the `ccxt_exchange` config key (default `gemini`), lazily importing `ccxt`
+- [x] 1.1.2 Wire crypto indicator computation to reuse the existing indicator engine over crypto OHLCV
 
 ### 1.2 Config-driven source registry
 
-- [ ] 1.2.1 Introduce a named data-source registry in `dataflows/` so adapters register under a name and `data_vendors` / `tool_vendors` select them by name
-- [ ] 1.2.2 Register the CCXT vendor adapter in the registry; raise a clear configuration error on an unknown source name
+- [x] 1.2.1 Introduce a named data-source registry in `dataflows/` so adapters register under a name and `data_vendors` / `tool_vendors` select them by name
+- [x] 1.2.2 Register the CCXT vendor adapter in the registry; raise a clear configuration error on an unknown source name
 
 ### 1.3 Vendor routing
 
-- [ ] 1.3.1 Route crypto market-data tool categories through the registry in `dataflows/interface.py` / `TOOLS_CATEGORIES`
-- [ ] 1.3.2 Ensure every crypto market-data tool accepts an as-of date and bounds returned data to it (no look-ahead)
+- [x] 1.3.1 Route crypto market-data tool categories through the registry in `dataflows/interface.py` / `TOOLS_CATEGORIES`
+- [x] 1.3.2 Ensure every crypto market-data tool accepts an as-of date and bounds returned data to it (no look-ahead)
 
 ### 1.4 Verify Phase 1
 
-- [ ] 1.4.1 Smoke test: fetch BTC OHLCV from Gemini for a date range and compute indicators
-- [ ] 1.4.2 Smoke test: switching `ccxt_exchange` to another CCXT exchange works with no code change
-- [ ] 1.4.3 Smoke test: equity vendors (yfinance, alpha_vantage) still route correctly under `asset_class: equity`
+- [x] 1.4.1 Smoke test: fetch BTC OHLCV from Gemini for a date range and compute indicators
+- [x] 1.4.2 Smoke test: switching `ccxt_exchange` to another CCXT exchange works with no code change
+- [x] 1.4.3 Smoke test: equity vendors (yfinance, alpha_vantage) still route correctly under `asset_class: equity`
 
 ## 2. Phase 2 — On-chain data layer
 
